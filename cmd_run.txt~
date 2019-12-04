@@ -1,0 +1,2 @@
+java -cp bin:lib/jblas-1.2.4.jar submodularMaxOverGraph/Driver [Algoirthm] [Prune Mode]>>cb_T.txt
+

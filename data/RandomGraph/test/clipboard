@@ -1,0 +1,83 @@
+#install.packages("igraph")
+library(igraph)
+
+#Random 2-D 
+set.seed(666)
+num_node=20 #200
+
+#routing network
+x_coord=runif(num_node+1, 0, 1)
+y_coord=runif(num_node+1, 0, 1)
+
+#G(n,p)
+#ps=seq(0.01, 0.1, by=0.01) #aaai16
+ps=seq(0.01, 0.2, by=0.01)#jair
+
+for(p in 1:length(ps)){
+er<-erdos.renyi.game(num_node+1, ps[p])  #generate +1 node for start and end, which is not in social network
+
+#2-D Non Interactive Plot
+plot(er, layout=layout_with_fr, vertex.size=5, vertex.label=NA, edge.width=2)
+dev.copy(pdf, paste0(paste0("rg_er_vis_", p), ".pdf"))
+dev.off()
+
+#Edge list
+er.eglist<-as.data.frame(get.edgelist(er))
+
+#Vertex name
+v.names<-V(er)
+
+#Node List
+ID<-(as.numeric(v.names)-1)
+v.list<-data.frame(ID, x_coord, y_coord)
+write.csv(v.list, file=paste0(paste0("rg_er_nodes_", p), ".csv"), row.names=FALSE, quote=FALSE)
+
+#RoutingNet
+frm=er.eglist$V1
+to=er.eglist$V2
+len_mi=rep(0,length(frm))
+for(i in 1:length(frm)){
+v_x=(v.list$x_coord[frm[i]]-v.list$x_coord[to[i]])^2
+print(v_x)
+v_y=(v.list$y_coord[frm[i]]-v.list$y_coord[to[i]])^2
+print(v_y)
+len_mi[i]=sqrt(v_x+v_y) 
+print(len_mi[i])
+#Euclidian distance based on random location
+}
+rt.net<-data.frame(frm, to, len_mi)
+write.csv(rt.net, file=paste0(paste0("rg_er_rtNet_", p), ".csv"), row.names=FALSE, quote=FALSE)
+}
+
+#social network
+#the number of edges to add in each time step
+ms=c(1,2,3,4,5) 
+
+for(m in 1:length(ms)){
+er<-barabasi.game(num_node, m=ms[m], directed=FALSE)
+
+#2-D Non Interactive Plot
+plot(er, layout=layout_with_fr, vertex.size=5, vertex.label=NA, edge.width=2, edge.arrow.size=0.5)
+dev.copy(pdf, paste0(paste0("rg_ba_vis_", m), ".pdf"))
+dev.off()
+
+#Edge list
+er.eglist<-as.data.frame(get.edgelist(er))
+
+#Vertex name
+v.names<-V(er)
+
+#Node List
+ID<-as.numeric(v.names)
+v.list<-data.frame(ID, x_coord[-1], y_coord[-1])
+write.csv(v.list, file=paste0(paste0("rg_ba_nodes_", m), ".csv"), row.names=FALSE, quote=FALSE)
+
+#RoutingNet
+frm=er.eglist$V1
+to=er.eglist$V2
+wt=rep(0,length(frm))
+if.net<-data.frame(frm, to, wt)
+write.csv(if.net, file=paste0(paste0("rg_ba_ifNet_", m), ".csv"), row.names=FALSE, quote=FALSE)
+
+}
+

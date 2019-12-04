@@ -1,0 +1,14 @@
+"frm","to","len_mi"
+S,A,1
+A,B,4
+A,C,3
+A,E,7
+B,D,5
+B,C,6
+C,D,11
+C,E,8
+D,E,2
+D,F,2
+D,G,10
+E,G,5
+F,G,3
